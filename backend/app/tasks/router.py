@@ -1,0 +1,30 @@
+from fastapi import APIRouter, HTTPException, status, Depends
+from app.tasks import schema as tasks_schema
+from app import models
+from app.database import get_db
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+
+
+router = APIRouter()
+
+
+@router.post("/", response_model=tasks_schema.TaskRead)
+def create_task(task: tasks_schema.TaskCreate, db: Session = Depends(get_db)):
+    """API endpoint for adding a task"""
+
+    new_task = models.Task(**task.dict())
+
+    try:
+        db.add(new_task)
+        db.commit()
+    except IntegrityError as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="There was an error"
+        )
+    else:
+        db.refresh(new_task)
+
+    return new_task
