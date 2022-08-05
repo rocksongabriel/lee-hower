@@ -4,6 +4,7 @@ from app import models
 from app.database import get_db
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from typing import List
 
 
 router = APIRouter()
@@ -28,3 +29,12 @@ def create_task(task: tasks_schema.TaskCreate, db: Session = Depends(get_db)):
         db.refresh(new_task)
 
     return new_task
+
+
+@router.get("/", response_model=List[tasks_schema.TaskRead])
+def get_all_tasks(db: Session = Depends(get_db)):
+    """API endpoint for getting all tasks"""
+
+    tasks = db.query(models.Task).all()
+
+    return tasks
