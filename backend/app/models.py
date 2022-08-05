@@ -10,7 +10,7 @@ class Task(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String(length=255), nullable=False, index=True)
-    decription = Column(String(length=500), nullable=True, index=True)
+    description = Column(String(length=500), nullable=True, index=True)
     created = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
