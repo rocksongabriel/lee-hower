@@ -42,7 +42,7 @@ def get_all_tasks(db: Session = Depends(get_db)):
 
 
 @router.get("/{uuid}", response_model=tasks_schema.TaskRead)
-def get_post(uuid: UUID4, db: Session = Depends(get_db)):
+def get_task(uuid: UUID4, db: Session = Depends(get_db)):
     """API endpoint to get an individual task by it's uuid"""
 
     task = db.query(models.Task).filter(models.Task.id == uuid).first()
@@ -54,3 +54,4 @@ def get_post(uuid: UUID4, db: Session = Depends(get_db)):
         )
 
     return task
+
