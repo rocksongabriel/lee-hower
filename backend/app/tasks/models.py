@@ -2,7 +2,7 @@ from sqlalchemy import Column, Boolean, String, Integer, TIMESTAMP
 from sqlalchemy.sql.expression import text
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-from .database import Base
+from app.database import Base
 
 
 class Task(Base):
