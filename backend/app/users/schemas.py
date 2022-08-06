@@ -17,7 +17,7 @@ class UserRegister(BaseModel):
     """Pydantic model for registering a user account"""
 
     email: EmailStr
-    password: SecretStr
+    password: str
 
 
 class UserProfileUpdate(UserBase):
@@ -31,3 +31,6 @@ class UserRead(UserBase):
 
     id: UUID4
     email: EmailStr
+
+    class Config:
+        orm_mode = True
