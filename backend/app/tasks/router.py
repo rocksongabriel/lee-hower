@@ -23,8 +23,7 @@ def create_task(task: tasks_schema.TaskCreate, db: Session = Depends(get_db)):
     except IntegrityError as e:
         print(e)
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="There was an error"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="There was an error"
         )
     else:
         db.refresh(new_task)
@@ -50,7 +49,7 @@ def get_task(uuid: UUID4, db: Session = Depends(get_db)):
     if task is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Task with id {uuid} does not exist"
+            detail=f"Task with id {uuid} does not exist",
         )
 
     return task
@@ -65,9 +64,34 @@ def delete_task(uuid: UUID4, db: Session = Depends(get_db)):
     if task.first() is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Task with id {uuid} does not exist"
+            detail=f"Task with id {uuid} does not exist",
         )
 
     task.delete(synchronize_session=False)
 
     db.commit()
+
+
+@router.put("/{uuid}", response_model=tasks_schema.TaskRead)
+def update_task(
+    uuid: UUID4,
+    updated_task: tasks_schema.TaskCreate,
+    db: Session = Depends(get_db),
+):
+    """API endpoint to update a task"""
+
+    task_query = db.query(models.Task).filter(models.Task.id == uuid)
+
+    task = task_query.first()
+
+    if task is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Task with id {uuid} does not exist",
+        )
+
+    task_query.update(updated_task.dict(), synchronize_session=False)
+
+    db.commit()
+
+    return task
