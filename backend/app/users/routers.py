@@ -1,4 +1,5 @@
 from fastapi import HTTPException, APIRouter, status, Depends
+from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from app.database import get_db
@@ -40,3 +41,15 @@ def register_user(data: UserRegister, db: Session = Depends(get_db)):
         db.refresh(user)
 
     return user
+
+
+@router.get("/", response_model=List[UserRead])
+def get_users(db: Session = Depends(get_db)):
+    """
+    API endpoint to get all users
+    Return all the users in the database.
+    """
+
+    users = db.query(User).all()
+
+    return users
