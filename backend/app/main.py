@@ -2,10 +2,17 @@ from fastapi import FastAPI
 from . import models
 from .database import engine
 
+# import routers
 from app.tasks.router import router as task_router
 
+# import sqlalchemy models
+from app.users.models import User
+# TODO move the task model to it's own file and import it here
 
+
+# Bind the sqlachemy modelds to the database
 models.Base.metadata.create_all(bind=engine)
+User.metadata.create_all(bind=engine)
 
 
 # Initialize the app
