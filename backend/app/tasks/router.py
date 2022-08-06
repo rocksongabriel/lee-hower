@@ -43,7 +43,7 @@ def get_all_tasks(db: Session = Depends(get_db)):
 
 @router.get("/{uuid}", response_model=tasks_schema.TaskRead)
 def get_task(uuid: UUID4, db: Session = Depends(get_db)):
-    """API endpoint to get an individual task by it's uuid"""
+    """API endpoint to get an individual task by its uuid"""
 
     task = db.query(models.Task).filter(models.Task.id == uuid).first()
 
@@ -55,3 +55,19 @@ def get_task(uuid: UUID4, db: Session = Depends(get_db)):
 
     return task
 
+
+@router.delete("/{uuid}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_task(uuid: UUID4, db: Session = Depends(get_db)):
+    """API endpoint to delete a task"""
+
+    task = db.query(models.Task).filter(models.Task.id == uuid)
+
+    if task.first() is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Task with id {uuid} does not exist"
+        )
+
+    task.delete(synchronize_session=False)
+
+    db.commit()
