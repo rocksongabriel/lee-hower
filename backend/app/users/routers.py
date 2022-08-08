@@ -1,5 +1,6 @@
 from fastapi import HTTPException, APIRouter, status, Depends
 from typing import List
+from pydantic.types import UUID4
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from app.database import get_db
@@ -53,3 +54,21 @@ def get_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
 
     return users
+
+
+@router.get("/{uuid}", response_model=UserRead)
+def get_user(uuid: UUID4, db: Session = Depends(get_db)):
+    """
+    API Endpoint to get an individual user by id
+    Return user info
+    """
+
+    user = db.query(User).filter(User.id == uuid).first()
+
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id {uuid} does not exist"
+        )
+
+    return user
