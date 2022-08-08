@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from app.database import get_db
 
-from .schemas import UserRegister, UserRead
+from .schemas import UserRegister, UserRead, UserProfileUpdate
 from .models import User
 
 from app.utils.security import hash_password
@@ -68,7 +68,32 @@ def get_user(uuid: UUID4, db: Session = Depends(get_db)):
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with id {uuid} does not exist"
+            detail=f"User with id {uuid} does not exist",
         )
+
+    return user
+
+
+@router.put("/{uuid}", response_model=UserRead)
+def update_user(
+    uuid: UUID4, updated_data: UserProfileUpdate, db: Session = Depends(get_db)
+):
+    """
+    API Endpoint to update a user's data when given its id
+    Return the updated user info
+    """
+
+    user_query = db.query(User).filter(User.id == uuid)
+
+    user = user_query.first()
+
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id {uuid} does not exist",
+        )
+
+    user_query.update(updated_data.dict(), synchronize_session=False)
+    db.commit()
 
     return user
