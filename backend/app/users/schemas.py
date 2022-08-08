@@ -10,7 +10,6 @@ class UserBase(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     is_active: bool = True
-    created: datetime
 
 
 class UserRegister(BaseModel):
@@ -31,6 +30,7 @@ class UserRead(UserBase):
 
     id: UUID4
     email: EmailStr
+    created: datetime
 
     class Config:
         orm_mode = True
