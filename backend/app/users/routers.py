@@ -97,3 +97,22 @@ def update_user(
     db.commit()
 
     return user
+
+
+@router.delete("/{uuid}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(uuid: UUID4, db: Session = Depends(get_db)):
+    """
+    API endpoint to delete a specific user from the database.
+    Return no response data
+    """
+
+    user_query = db.query(User).filter(User.id == uuid)
+
+    if user_query.first() is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id {uuid} does not exist."
+        )
+
+    user_query.delete(synchronize_session=False)
+    db.commit()
