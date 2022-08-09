@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "*"
+uvicorn = "*"
+sqlalchemy = "*"
+psycopg2-binary = "*"
+python-multipart = "*"
+bcrypt = "*"
+python-jose = "*"
+passlib = "*"
+pydantic = {extras = ["email"], version = "*"}
+email-validator = "*"
+
+[dev-packages]
+black = "*"
+mypy = "*"
+bpython = "*"
+ipython = "*"
+
+[requires]
+python_version = "3.10"
