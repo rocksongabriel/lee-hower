@@ -25,7 +25,17 @@ def get_task(db: Session, uuid: UUID4):
     Get a task by uuid (id) from the database.
     Return this item.
     """
+
     return db.query(Task).filter(Task.id == uuid).first()
+
+
+def get_all_tasks(db: Session):
+    """
+    Get all tasks from the database.
+    Return all tasks
+    """
+
+    return db.query(Task).all()
 
 
 def get_task_query(db: Session, uuid: UUID4):
