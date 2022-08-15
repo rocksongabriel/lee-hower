@@ -2,15 +2,26 @@ from fastapi import HTTPException, APIRouter, status, Depends
 from typing import List
 from pydantic.types import UUID4
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from app.database import get_db
 
 from .schemas import UserRegister, UserRead, UserProfileUpdate
 from .models import User
 
+from app.users import crud
+
 from app.utils.security import hash_password
 
+
 router = APIRouter()
+
+
+def user_does_not_exist_exception(uuid: UUID4):
+    """Function to raise user does not exist error"""
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"User with id {uuid} does not exist",
+    )
+
 
 
 @router.post(
@@ -22,26 +33,12 @@ def register_user(data: UserRegister, db: Session = Depends(get_db)):
     Return the data of the user after successfuly sign up.
     """
 
-    # hash the password and set the user password field to the hashed
-    # password
     hashed_password = hash_password(data.password)
 
     user = User(**data.dict())
     user.password = hashed_password
 
-    try:
-        db.add(user)
-        db.commit()
-    except IntegrityError as e:
-        print(e)
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="The action conflicts with another object in database.",
-        )
-    else:
-        db.refresh(user)
-
-    return user
+    return crud.create_user(db, user)
 
 
 @router.get("/", response_model=List[UserRead])
@@ -51,9 +48,7 @@ def get_users(db: Session = Depends(get_db)):
     Return all the users in the database.
     """
 
-    users = db.query(User).all()
-
-    return users
+    return crud.get_all_users(db)
 
 
 @router.get("/{uuid}", response_model=UserRead)
@@ -63,14 +58,10 @@ def get_user(uuid: UUID4, db: Session = Depends(get_db)):
     Return user info
     """
 
-    user = db.query(User).filter(User.id == uuid).first()
+    user = crud.get_user(db, uuid)
 
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with id {uuid} does not exist",
-        )
-
+        return user_does_not_exist_exception(uuid)
     return user
 
 
@@ -83,18 +74,12 @@ def update_user(
     Return the updated user info
     """
 
-    user_query = db.query(User).filter(User.id == uuid)
-
-    user = user_query.first()
+    user = crud.get_user(db, uuid)
 
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with id {uuid} does not exist",
-        )
+        return user_does_not_exist_exception(uuid)
 
-    user_query.update(updated_data.dict(), synchronize_session=False)
-    db.commit()
+    crud.update_user(db, uuid, updated_data)
 
     return user
 
@@ -106,13 +91,9 @@ def delete_user(uuid: UUID4, db: Session = Depends(get_db)):
     Return no response data
     """
 
-    user_query = db.query(User).filter(User.id == uuid)
+    user = crud.get_user(db, uuid)
 
-    if user_query.first() is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with id {uuid} does not exist."
-        )
+    if user is None:
+        return user_does_not_exist_exception(uuid)
 
-    user_query.delete(synchronize_session=False)
-    db.commit()
+    crud.delete_user(db, uuid)

@@ -32,7 +32,7 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
 def get_all_tasks(db: Session = Depends(get_db)):
     """API endpoint for getting all tasks"""
 
-    tasks = db.query(Task).all()
+    tasks = crud.get_all_tasks(db)
 
     return tasks
 
