@@ -1,4 +1,5 @@
 from fastapi import HTTPException, status
+<<<<<<< HEAD
 from pydantic.types import UUID4
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
