@@ -9,7 +9,7 @@ from .models import User
 
 from app.users import crud
 
-from app.utils.security import hash_password
+from .utils import hash_password
 
 
 router = APIRouter()
@@ -21,7 +21,6 @@ def user_does_not_exist_exception(uuid: UUID4):
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"User with id {uuid} does not exist",
     )
-
 
 
 @router.post(

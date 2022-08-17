@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.tasks.schemas import TaskRead, TaskCreate
-from app.tasks.models import Task
 
 from app.tasks import crud
 
