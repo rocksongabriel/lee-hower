@@ -17,7 +17,7 @@ SECRET_KEY = "90565699a84ecb855fc42f1a71a931f7e7ee730cb0d9866e8a8d0d936c333077"
 
 def authenticate_user(
     db: Session, username: str, password: str
-) -> bool | User:
+) -> User | bool:
     """
     Take username and password and authenticate the user'
     username against their password.
@@ -56,7 +56,7 @@ def create_access_token(
     return encoded_jwt
 
 
-def refresh_access_token(data: dict[str, int | str | datetime]) -> str:
+def create_refresh_token(data: dict[str, int | str | datetime]) -> str:
     """
     Encode data and return encoded jwt string object.
     """
