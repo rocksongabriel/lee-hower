@@ -6,10 +6,10 @@ from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from app.auth.schemas import TokenData
+from app.database import get_db
+from app.users import crud
 from app.users.models import User
 from app.users.utils import verify_password
-
-from app.users import crud
 
 
 # CONSTANTS
@@ -75,8 +75,7 @@ def create_refresh_token(data: dict[str, int | str | datetime]) -> str:
 
 
 async def get_current_user(
-    db: Session,
-    token: str = Depends(oauth2_scheme)
+    db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 ):
     """
     Take a token and verify the token.
@@ -86,7 +85,7 @@ async def get_current_user(
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid credentials",
-        headers={"WWW-Authenticate": "Bearer"}
+        headers={"WWW-Authenticate": "Bearer"},
     )
 
     try:
@@ -107,15 +106,17 @@ async def get_current_user(
     return user
 
 
-async def get_current_active_user(current_user: User = Depends(get_current_user)):
+async def get_current_active_user(
+    current_user: User = Depends(get_current_user),
+):
     """
-    Return a user object if the user account is active.
+    Given the current user, return the user if the user's
+    account is active.
     """
 
     if not current_user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Inactive user."
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user."
         )
 
     return current_user
