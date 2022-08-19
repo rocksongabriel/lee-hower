@@ -3,6 +3,7 @@ from typing import List
 from pydantic.types import UUID4
 from sqlalchemy.orm import Session
 from app.database import get_db
+from app.auth.oauth2 import get_current_active_user
 
 from .schemas import UserRegister, UserRead, UserProfileUpdate
 from .models import User
@@ -41,7 +42,10 @@ def register_user(data: UserRegister, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=List[UserRead])
-def get_users(db: Session = Depends(get_db)):
+def get_users(
+    db: Session = Depends(get_db),
+    current_active_user: User = Depends(get_current_active_user),
+):
     """
     API endpoint to get all users
     Return all the users in the database.
@@ -51,7 +55,11 @@ def get_users(db: Session = Depends(get_db)):
 
 
 @router.get("/{uuid}", response_model=UserRead)
-def get_user(uuid: UUID4, db: Session = Depends(get_db)):
+def get_user(
+    uuid: UUID4,
+    db: Session = Depends(get_db),
+    current_active_user: User = Depends(get_current_active_user),
+):
     """
     API Endpoint to get an individual user by id
     Return user info
@@ -66,7 +74,10 @@ def get_user(uuid: UUID4, db: Session = Depends(get_db)):
 
 @router.put("/{uuid}", response_model=UserRead)
 def update_user(
-    uuid: UUID4, updated_data: UserProfileUpdate, db: Session = Depends(get_db)
+    uuid: UUID4,
+    updated_data: UserProfileUpdate,
+    db: Session = Depends(get_db),
+    current_active_user: User = Depends(get_current_active_user),
 ):
     """
     API Endpoint to update a user's data when given its id
@@ -84,7 +95,11 @@ def update_user(
 
 
 @router.delete("/{uuid}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(uuid: UUID4, db: Session = Depends(get_db)):
+def delete_user(
+    uuid: UUID4,
+    db: Session = Depends(get_db),
+    current_active_user: User = Depends(get_current_active_user),
+):
     """
     API endpoint to delete a specific user from the database.
     Return no response data
