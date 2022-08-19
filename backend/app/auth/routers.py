@@ -7,7 +7,7 @@ from app.auth.oauth2 import (
     create_access_token,
     create_refresh_token,
 )
-from app.auth.schemas import AccessRefreshToken
+from app.auth.schemas import AccessRefreshToken, Token
 from app.database import get_db
 
 

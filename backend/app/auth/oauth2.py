@@ -1,10 +1,15 @@
 from datetime import datetime, timedelta
 
-from jose import jwt
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
 from sqlalchemy.orm import Session
+
+from app.auth.schemas import TokenData
+from app.users.models import User
 from app.users.utils import verify_password
 
-from app.users.models import User
+from app.users import crud
 
 
 # CONSTANTS
@@ -13,6 +18,9 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60  # 60 minutes
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24  # 1 day
 # TODO put this in .env
 SECRET_KEY = "90565699a84ecb855fc42f1a71a931f7e7ee730cb0d9866e8a8d0d936c333077"
+
+# Oauth2 scheme
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
 def authenticate_user(
@@ -64,3 +72,36 @@ def create_refresh_token(data: dict[str, int | str | datetime]) -> str:
     return create_access_token(
         data, expires_delta=timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
     )
+
+
+async def get_current_user(
+    db: Session,
+    token: str = Depends(oauth2_scheme)
+):
+    """
+    Take a token and verify the token.
+    Return a user object if token is valid.
+    """
+
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid credentials",
+        headers={"WWW-Authenticate": "Bearer"}
+    )
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        id = payload.get("sub")
+        if id is None:
+            raise credentials_exception
+        token_data = TokenData(id=id)
+    except JWTError as e:
+        print(e)
+        raise credentials_exception
+    else:
+        user = crud.get_user(db, token_data.id)
+
+    if user is None:
+        raise credentials_exception
+
+    return user

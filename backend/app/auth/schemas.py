@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from pydantic.types import UUID4
 
 
 class Token(BaseModel):
@@ -9,3 +10,7 @@ class Token(BaseModel):
 class AccessRefreshToken(BaseModel):
     access_token: Token
     refresh_token: Token
+
+
+class TokenData(BaseModel):
+    id: UUID4
