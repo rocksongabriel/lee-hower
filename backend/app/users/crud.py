@@ -1,9 +1,7 @@
 from fastapi import HTTPException, status
-<<<<<<< HEAD
 from pydantic.types import UUID4
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from sqlalchemy.orm.query import Query
 
 from app.users.models import User
 from app.users.schemas import UserProfileUpdate

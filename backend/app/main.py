@@ -1,15 +1,14 @@
 from fastapi import FastAPI
-from .database import engine
+from pydantic import UUIDVersionError
+import uvicorn
 
-# import routers
+from app.auth.routers import router as auth_router
+from app.tasks.models import Task
 from app.tasks.routers import router as tasks_router
+from app.users.models import User
 from app.users.routers import router as users_router
 
-# import sqlalchemy models
-from app.users.models import User
-from app.tasks.models import Task
-
-# TODO move the task model to it's own file and import it here
+from .database import engine
 
 
 # Bind the sqlachemy modelds to the database
@@ -23,8 +22,13 @@ app = FastAPI()
 # Register the routes
 app.include_router(tasks_router, prefix="/tasks", tags=["Task"])
 app.include_router(users_router, prefix="/users", tags=["Accounts", "Users"])
+app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 
 
 @app.get("/")
 def home():
     return {"status": "API RUNNING"}
+
+
+if __name__ == "__main__":
+    uvicorn.run(home)

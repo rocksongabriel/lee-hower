@@ -1,13 +1,14 @@
-from fastapi import APIRouter, HTTPException, status, Depends
-from pydantic import UUID4
-from app.database import get_db
-from sqlalchemy.orm import Session
 from typing import List
 
-from app.tasks.schemas import TaskRead, TaskCreate
-from app.tasks.models import Task
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import UUID4
+from sqlalchemy.orm import Session
 
+from app.auth.oauth2 import get_current_active_user, get_current_user
+from app.database import get_db
 from app.tasks import crud
+from app.tasks.schemas import TaskCreate, TaskRead
+from app.users.models import User
 
 
 router = APIRouter()
@@ -22,14 +23,21 @@ def task_not_found(task_uuid: UUID4):
 
 
 @router.post("/", response_model=TaskRead)
-def create_task(task: TaskCreate, db: Session = Depends(get_db)):
+def create_task(
+    task: TaskCreate,
+    db: Session = Depends(get_db),
+    current_active_user: User = Depends(get_current_active_user),
+):
     """API endpoint for adding a task"""
 
     return crud.create_task(db, task)
 
 
 @router.get("/", response_model=List[TaskRead])
-def get_all_tasks(db: Session = Depends(get_db)):
+def get_all_tasks(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """API endpoint for getting all tasks"""
 
     tasks = crud.get_all_tasks(db)
@@ -38,7 +46,11 @@ def get_all_tasks(db: Session = Depends(get_db)):
 
 
 @router.get("/{uuid}", response_model=TaskRead)
-def get_task(uuid: UUID4, db: Session = Depends(get_db)):
+def get_task(
+    uuid: UUID4,
+    db: Session = Depends(get_db),
+    current_active_user: User = Depends(get_current_active_user),
+):
     """API endpoint to get an individual task by its uuid"""
 
     task = crud.get_task(db, uuid)
@@ -50,7 +62,11 @@ def get_task(uuid: UUID4, db: Session = Depends(get_db)):
 
 
 @router.delete("/{uuid}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_task(uuid: UUID4, db: Session = Depends(get_db)):
+def delete_task(
+    uuid: UUID4,
+    db: Session = Depends(get_db),
+    current_active_user: User = Depends(get_current_active_user),
+):
     """API endpoint to delete a task"""
 
     task = crud.get_task(db, uuid)
@@ -67,6 +83,7 @@ def update_task(
     uuid: UUID4,
     updated_task: TaskCreate,
     db: Session = Depends(get_db),
+    current_active_user: User = Depends(get_current_active_user),
 ):
     """API endpoint to update a task"""
 
