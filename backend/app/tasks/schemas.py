@@ -26,6 +26,7 @@ class TaskRead(TaskBase):
 
     id: UUID4
     created: datetime
+    owner_id: UUID4
 
     class Config:
         orm_mode = True

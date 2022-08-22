@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Boolean, String, Integer, TIMESTAMP
+from sqlalchemy import Column, Boolean, ForeignKey, String, Integer, TIMESTAMP
 from sqlalchemy.sql.expression import text
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
@@ -19,3 +19,7 @@ class Task(Base):
     completed = Column(Boolean, nullable=False, server_default="FALSE")
     time_to_spend = Column(Integer, nullable=False)
     time_spent = Column(Integer, nullable=True)
+
+    owner_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE")
+    )
