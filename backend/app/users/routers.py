@@ -1,15 +1,16 @@
-from fastapi import HTTPException, APIRouter, status, Depends
 from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic.types import UUID4
 from sqlalchemy.orm import Session
-from app.database import get_db
+
 from app.auth.oauth2 import get_current_active_user
-
-from .schemas import UserRegister, UserRead, UserProfileUpdate
-from .models import User
-
+from app.database import get_db
+from app.exceptions import user_not_authorized_exception
 from app.users import crud
 
+from .models import User
+from .schemas import UserProfileUpdate, UserRead, UserRegister
 from .utils import hash_password
 
 
@@ -56,7 +57,6 @@ def get_users(
 
 @router.get("/{uuid}", response_model=UserRead)
 def get_user(
-    uuid: UUID4,
     db: Session = Depends(get_db),
     current_active_user: User = Depends(get_current_active_user),
 ):
@@ -64,12 +64,7 @@ def get_user(
     API Endpoint to get an individual user by id
     Return user info
     """
-
-    user = crud.get_user(db, uuid)
-
-    if user is None:
-        return user_does_not_exist_exception(uuid)
-    return user
+    return current_active_user
 
 
 @router.put("/{uuid}", response_model=UserRead)
@@ -88,6 +83,9 @@ def update_user(
 
     if user is None:
         return user_does_not_exist_exception(uuid)
+
+    if current_active_user.id != user.id:
+        raise user_not_authorized_exception
 
     crud.update_user(db, uuid, updated_data)
 
@@ -109,5 +107,8 @@ def delete_user(
 
     if user is None:
         return user_does_not_exist_exception(uuid)
+
+    if current_active_user.id != user.id:
+        raise user_not_authorized_exception
 
     crud.delete_user(db, uuid)

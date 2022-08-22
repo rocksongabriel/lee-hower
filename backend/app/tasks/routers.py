@@ -11,6 +11,8 @@ from app.tasks.schemas import TaskCreate, TaskRead
 from app.users.models import User
 from app.tasks.models import Task
 
+from app.exceptions import user_not_authorized_exception
+
 
 router = APIRouter()
 
@@ -22,10 +24,11 @@ def task_not_found(task_uuid: UUID4):
         detail=f"Task with id {task_uuid} does not exist.",
     )
 
+
 user_not_authorized_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="User unauthorized to perform operation."
-    )
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="User unauthorized to perform operation.",
+)
 
 
 @router.post("/", response_model=TaskRead, status_code=status.HTTP_201_CREATED)
