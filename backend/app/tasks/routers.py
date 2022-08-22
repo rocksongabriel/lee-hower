@@ -9,6 +9,7 @@ from app.database import get_db
 from app.tasks import crud
 from app.tasks.schemas import TaskCreate, TaskRead
 from app.users.models import User
+from app.tasks.models import Task
 
 
 router = APIRouter()
@@ -22,19 +23,21 @@ def task_not_found(task_uuid: UUID4):
     )
 
 
-@router.post("/", response_model=TaskRead)
-def create_task(
-    task: TaskCreate,
+@router.post("/", response_model=TaskRead, status_code=status.HTTP_201_CREATED)
+async def create_task(
+    new_task: TaskCreate,
     db: Session = Depends(get_db),
     current_active_user: User = Depends(get_current_active_user),
 ):
     """API endpoint for adding a task"""
 
-    return crud.create_task(db, task)
+    new_task = Task(owner_id=current_active_user.id, **new_task.dict())
+
+    return crud.create_task(db, new_task)
 
 
 @router.get("/", response_model=List[TaskRead])
-def get_all_tasks(
+async def get_all_tasks(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):

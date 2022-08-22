@@ -6,12 +6,14 @@ from app.tasks.models import Task
 from app.tasks.schemas import TaskCreate
 
 
-def create_task(db: Session, task: TaskCreate):
+def create_task(db: Session, new_task: TaskCreate):
     """
     Create new task in the database.
     Return the new task.
     """
-    new_task = Task(**task.dict())
+
+    print(new_task)
+    print(db)
 
     db.add(new_task)
     db.commit()
@@ -36,6 +38,15 @@ def get_all_tasks(db: Session):
     """
 
     return db.query(Task).all()
+
+
+def get_user_tasks(db: Session, user_id: str):
+    """
+    Given a user's id, get and return all their
+    tasks from the database
+    """
+
+    pass
 
 
 def get_task_query(db: Session, uuid: UUID4):
