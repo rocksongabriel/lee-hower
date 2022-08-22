@@ -22,6 +22,11 @@ def task_not_found(task_uuid: UUID4):
         detail=f"Task with id {task_uuid} does not exist.",
     )
 
+user_not_authorized_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="User unauthorized to perform operation."
+    )
+
 
 @router.post("/", response_model=TaskRead, status_code=status.HTTP_201_CREATED)
 async def create_task(
@@ -61,6 +66,9 @@ def get_task(
     if not task:
         return task_not_found(uuid)
 
+    if current_active_user.id != task.owner_id:
+        raise user_not_authorized_exception
+
     return task
 
 
@@ -80,6 +88,9 @@ def delete_task(
     if not task:
         return task_not_found(uuid)
 
+    if current_active_user.id != task.owner_id:
+        raise user_not_authorized_exception
+
 
 @router.put("/{uuid}", response_model=TaskRead)
 def update_task(
@@ -94,6 +105,9 @@ def update_task(
 
     if not task:
         return task_not_found(uuid)
+
+    if current_active_user.id != task.owner_id:
+        raise user_not_authorized_exception
 
     task_query = crud.get_task_query(db, uuid)
     crud.update_task(db, task_query, updated_task)
