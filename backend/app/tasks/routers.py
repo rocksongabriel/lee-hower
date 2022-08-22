@@ -37,13 +37,13 @@ async def create_task(
 
 
 @router.get("/", response_model=List[TaskRead])
-async def get_all_tasks(
+async def get_users_tasks_all(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """API endpoint for getting all tasks"""
+    """API endpoint for getting all user's tasks"""
 
-    tasks = crud.get_all_tasks(db)
+    tasks = crud.get_user_tasks(db=db, user_id=current_user.id)
 
     return tasks
 

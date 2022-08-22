@@ -40,13 +40,13 @@ def get_all_tasks(db: Session):
     return db.query(Task).all()
 
 
-def get_user_tasks(db: Session, user_id: str):
+def get_user_tasks(db: Session, user_id: UUID4):
     """
     Given a user's id, get and return all their
     tasks from the database
     """
 
-    pass
+    return db.query(Task).filter(Task.owner_id == user_id).all()
 
 
 def get_task_query(db: Session, uuid: UUID4):
