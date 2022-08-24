@@ -11,13 +11,13 @@ from app.users import crud
 from app.users.models import User
 from app.users.utils import verify_password
 
+from app.config import settings
 
 # CONSTANTS
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60  # 60 minutes
-REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24  # 1 day
-# TODO put this in .env
-SECRET_KEY = "90565699a84ecb855fc42f1a71a931f7e7ee730cb0d9866e8a8d0d936c333077"
+ALGORITHM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes  # 3 hours
+REFRESH_TOKEN_EXPIRE_MINUTES = settings.refresh_token_expire_minutes # 1 day
+SECRET_KEY = settings.secret_key
 
 # Oauth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")

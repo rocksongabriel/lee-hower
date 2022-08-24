@@ -1,6 +1,4 @@
 from fastapi import FastAPI
-from pydantic import UUIDVersionError
-import uvicorn
 
 from app.auth.routers import router as auth_router
 from app.tasks.models import Task
@@ -28,7 +26,3 @@ app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 @app.get("/")
 def home():
     return {"status": "API RUNNING"}
-
-
-if __name__ == "__main__":
-    uvicorn.run(home)
