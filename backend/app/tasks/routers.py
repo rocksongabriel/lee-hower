@@ -39,9 +39,7 @@ async def create_task(
 ):
     """API endpoint for adding a task"""
 
-    new_task = Task(owner_id=current_active_user.id, **new_task.dict())
-
-    return crud.create_task(db, new_task)
+    return crud.create_user_task(db, new_task, current_active_user.id)
 
 
 @router.get("/", response_model=List[TaskRead])

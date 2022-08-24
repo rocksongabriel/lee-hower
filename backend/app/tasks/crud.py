@@ -6,6 +6,20 @@ from app.tasks.models import Task
 from app.tasks.schemas import TaskCreate
 
 
+def create_user_task(db: Session, task: TaskCreate, user_id: UUID4):
+    """
+    Given the user_id and a new task, create and return a new task
+    """
+
+    new_task = Task(owner_id=user_id, **task.dict())
+
+    db.add(new_task)
+    db.commit()
+    db.refresh(new_task)
+
+    return new_task
+
+
 def create_task(db: Session, new_task: TaskCreate):
     """
     Create new task in the database.
