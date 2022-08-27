@@ -16,7 +16,7 @@ from app.config import settings
 # CONSTANTS
 ALGORITHM = settings.algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes  # 3 hours
-REFRESH_TOKEN_EXPIRE_MINUTES = settings.refresh_token_expire_minutes # 1 day
+REFRESH_TOKEN_EXPIRE_MINUTES = settings.refresh_token_expire_minutes  # 1 day
 SECRET_KEY = settings.secret_key
 
 # Oauth2 scheme

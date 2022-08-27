@@ -3,13 +3,11 @@ from sqlalchemy import Column
 from sqlalchemy.types import Boolean, String, TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql.expression import text
-from app.database import Base
+from app.db.base_class import Base
 
 
 class User(Base):
     """SQLAlchemy model for Users"""
-
-    __tablename__ = "users"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     email = Column(String, nullable=False, unique=True)

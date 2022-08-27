@@ -2,11 +2,10 @@ from sqlalchemy import Column, Boolean, ForeignKey, String, Integer, TIMESTAMP
 from sqlalchemy.sql.expression import text
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-from app.database import Base
+from app.db.base_class import Base
 
 
 class Task(Base):
-    __tablename__ = "tasks"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String(length=255), nullable=False, index=True)
