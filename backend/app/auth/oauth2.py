@@ -11,7 +11,9 @@ from app.users import crud
 from app.users.models import User
 from app.users.utils import verify_password
 
-from app.config import settings
+from app.config import get_settings
+
+settings = get_settings()
 
 # CONSTANTS
 ALGORITHM = settings.algorithm
