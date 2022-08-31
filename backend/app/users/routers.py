@@ -28,7 +28,7 @@ def user_does_not_exist_exception(uuid: UUID4):
 @router.post(
     "/register", response_model=UserRead, status_code=status.HTTP_201_CREATED
 )
-def register_user(data: UserRegister, db: Session = Depends(get_db)):
+async def register_user(data: UserRegister, db: Session = Depends(get_db)):
     """
     Api endpoint to register a user
     Return the data of the user after successfuly sign up.
@@ -43,7 +43,7 @@ def register_user(data: UserRegister, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=List[UserRead])
-def get_users(
+async def get_users(
     db: Session = Depends(get_db),
     current_active_user: User = Depends(get_current_active_user),
 ):
@@ -56,7 +56,7 @@ def get_users(
 
 
 @router.get("/{uuid}", response_model=UserRead)
-def get_user(
+async def get_user(
     db: Session = Depends(get_db),
     current_active_user: User = Depends(get_current_active_user),
 ):
@@ -68,7 +68,7 @@ def get_user(
 
 
 @router.put("/{uuid}", response_model=UserRead)
-def update_user(
+async def update_user(
     uuid: UUID4,
     updated_data: UserProfileUpdate,
     db: Session = Depends(get_db),
@@ -93,7 +93,7 @@ def update_user(
 
 
 @router.delete("/{uuid}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(
+async def delete_user(
     uuid: UUID4,
     db: Session = Depends(get_db),
     current_active_user: User = Depends(get_current_active_user),

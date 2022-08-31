@@ -17,7 +17,7 @@ from app.exceptions import user_not_authorized_exception
 router = APIRouter()
 
 
-def task_not_found(task_uuid: UUID4):
+async def task_not_found(task_uuid: UUID4):
     """Raise HTTPException indicating task does not"""
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -55,7 +55,7 @@ async def get_users_tasks_all(
 
 
 @router.get("/{uuid}", response_model=TaskRead)
-def get_task(
+async def get_task(
     uuid: UUID4,
     db: Session = Depends(get_db),
     current_active_user: User = Depends(get_current_active_user),
@@ -74,7 +74,7 @@ def get_task(
 
 
 @router.delete("/{uuid}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_task(
+async def delete_task(
     uuid: UUID4,
     db: Session = Depends(get_db),
     current_active_user: User = Depends(get_current_active_user),
@@ -94,7 +94,7 @@ def delete_task(
 
 
 @router.put("/{uuid}", response_model=TaskRead)
-def update_task(
+async def update_task(
     uuid: UUID4,
     updated_task: TaskCreate,
     db: Session = Depends(get_db),
