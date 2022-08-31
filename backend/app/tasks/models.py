@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from app.users.models import User
 
 
-class Task(Base):
+class Task(Base): # type: ignore
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String(length=255), nullable=False, index=True)
@@ -19,8 +19,8 @@ class Task(Base):
     created = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
-    urgent = Column(Boolean, nullable=False, server_default="FALSE")
-    important = Column(Boolean, nullable=False, server_default="FALSE")
+    urgency = Column(Boolean, nullable=False, server_default="FALSE")
+    importance = Column(Boolean, nullable=False, server_default="FALSE")
     completed = Column(Boolean, nullable=False, server_default="FALSE")
     time_to_spend = Column(Integer, nullable=False)
     time_spent = Column(Integer, nullable=True)
