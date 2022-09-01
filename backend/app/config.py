@@ -2,15 +2,22 @@ from functools import lru_cache
 
 from pydantic import BaseSettings
 
+
 class Settings(BaseSettings):
 
     environment: str
 
-    database_host: str
-    database_name: str
-    database_username: str
-    database_password: str
-    database_port: str
+    dev_database_host: str
+    dev_database_name: str
+    dev_database_username: str
+    dev_database_password: str
+    dev_database_port: str
+
+    test_database_name: str
+    test_database_host: str
+    test_database_username: str
+    test_database_password: str
+    test_database_port: str
 
     algorithm: str
     access_token_expire_minutes: int
@@ -24,4 +31,4 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    return Settings()  # type: ignore
