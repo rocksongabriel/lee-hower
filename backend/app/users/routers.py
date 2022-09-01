@@ -5,7 +5,7 @@ from pydantic.types import UUID4
 from sqlalchemy.orm import Session
 
 from app.auth.oauth2 import get_current_active_user
-from app.database import get_db
+from app.db.config import get_db
 from app.exceptions import user_not_authorized_exception
 from app.users import crud
 

@@ -6,7 +6,7 @@ from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from app.auth.schemas import TokenData
-from app.database import get_db
+from app.db.config import get_db
 from app.users import crud
 from app.users.models import User
 from app.users.utils import verify_password

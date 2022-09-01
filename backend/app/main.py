@@ -6,12 +6,12 @@ from app.tasks.routers import router as tasks_router
 from app.users.models import User
 from app.users.routers import router as users_router
 
-from .database import engine
+from app.db.config import engine
 
 
 # Bind the sqlachemy modelds to the database
-Task.metadata.create_all(bind=engine)
-User.metadata.create_all(bind=engine)
+Task.metadata.create_all(bind=engine) # type: ignore
+User.metadata.create_all(bind=engine) # type: ignore
 
 
 # Initialize the app

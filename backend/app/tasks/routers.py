@@ -5,7 +5,7 @@ from pydantic import UUID4
 from sqlalchemy.orm import Session
 
 from app.auth.oauth2 import get_current_active_user, get_current_user
-from app.database import get_db
+from app.db.config import get_db
 from app.tasks import crud
 from app.tasks.schemas import TaskCreate, TaskRead
 from app.users.models import User

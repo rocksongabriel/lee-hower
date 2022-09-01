@@ -8,7 +8,7 @@ from app.auth.oauth2 import (
     create_refresh_token,
 )
 from app.auth.schemas import AccessRefreshToken, Token
-from app.database import get_db
+from app.db.config import get_db
 
 
 router = APIRouter()

@@ -7,18 +7,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.config import get_settings
-from app.database import get_db
+from app.db.config import get_db
 from app.db.base import Base
 from app.main import app as main_app
-
-
-# Fastapi application
-# def start_application():
-#   app = FastAPI()
-#   app.include_router(tasks_router)
-#   app.include_router(users_router)
-#
-#   return app
 
 
 # Configuration for test Database
