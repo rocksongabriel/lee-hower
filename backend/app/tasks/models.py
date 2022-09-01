@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from app.users.models import User
 
 
-class Task(Base): # type: ignore
+class Task(Base):  # type: ignore
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String(length=255), nullable=False, index=True)

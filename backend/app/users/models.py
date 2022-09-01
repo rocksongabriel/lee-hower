@@ -12,7 +12,8 @@ from app.db.base_class import Base
 if TYPE_CHECKING:
     from app.tasks.models import Task
 
-class User(Base): # type: ignore
+
+class User(Base):  # type: ignore
     """SQLAlchemy model for Users"""
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
