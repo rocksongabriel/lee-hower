@@ -42,7 +42,7 @@ async def register_user(data: UserRegister, db: Session = Depends(get_db)):
     return crud.create_user(db, user)
 
 
-@router.get("/", response_model=List[UserRead])
+@router.get("/", response_model=List[UserRead], name="users:get-users")
 async def get_users(
     db: Session = Depends(get_db),
     current_active_user: User = Depends(get_current_active_user),
@@ -55,7 +55,7 @@ async def get_users(
     return crud.get_all_users(db)
 
 
-@router.get("/{uuid}", response_model=UserRead)
+@router.get("/{uuid}", response_model=UserRead, name="users:get-user")
 async def get_user(
     db: Session = Depends(get_db),
     current_active_user: User = Depends(get_current_active_user),
@@ -67,7 +67,7 @@ async def get_user(
     return current_active_user
 
 
-@router.put("/{uuid}", response_model=UserRead)
+@router.put("/{uuid}", response_model=UserRead, name="users:update-user")
 async def update_user(
     uuid: UUID4,
     updated_data: UserProfileUpdate,
@@ -92,7 +92,7 @@ async def update_user(
     return user
 
 
-@router.delete("/{uuid}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{uuid}", status_code=status.HTTP_204_NO_CONTENT, name="delete-user")
 async def delete_user(
     uuid: UUID4,
     db: Session = Depends(get_db),
