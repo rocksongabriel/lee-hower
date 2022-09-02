@@ -14,7 +14,7 @@ from app.db.config import get_db
 router = APIRouter()
 
 
-@router.post("/login", response_model=AccessRefreshToken)
+@router.post("/login", response_model=AccessRefreshToken, name="users:login-email-and-password")
 async def get_access_and_refresh_token(
     db: Session = Depends(get_db),
     form_data: OAuth2PasswordRequestForm = Depends(),
