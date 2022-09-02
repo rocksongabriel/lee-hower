@@ -85,19 +85,19 @@ def create_single_user(client: TestClient):
     return new_data
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def authClient(client: TestClient, create_single_user, app: FastAPI):
     url = app.url_path_for("users:login-email-and-password")
-
     login_cred = {
         "username": create_single_user["email"],
         "password": create_single_user["password"],
     }
 
     res = client.post(url, login_cred)
-
     access_token = res.json()["access_token"]["token"]
-
     client.headers["Authorization"] = f"Bearer {access_token}"
+    client.headers["user_id"] = create_single_user[
+        "id"
+    ]  # TODO: Find a nice way to do this
 
     yield client

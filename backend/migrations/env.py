@@ -11,10 +11,11 @@ from alembic import context
 # access to the values within the .ini file in use.
 config = context.config
 
-settings= get_settings()
+settings = get_settings()
 
 config.set_main_option(
-    "sqlalchemy.url", f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_host}:{settings.database_port}/{settings.database_name}"
+    "sqlalchemy.url",
+    f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_host}:{settings.database_port}/{settings.database_name}",
 )
 
 # Interpret the config file for Python logging.
