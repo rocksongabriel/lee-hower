@@ -69,3 +69,35 @@ def client(
 
     app.dependency_overrides.clear()
 
+
+@pytest.fixture()
+def create_single_user(client: TestClient):
+    """
+    Create and return a new user object
+    """
+    user_data = {"email": "testuser@gmail.com", "password": "testpass1234"}
+
+    res = client.post("/users/register", json=user_data)
+
+    new_data = res.json()
+    new_data["password"] = user_data["password"]
+
+    return new_data
+
+
+@pytest.fixture(scope="function")
+def authClient(client: TestClient, create_single_user, app: FastAPI):
+    url = app.url_path_for("users:login-email-and-password")
+
+    login_cred = {
+        "username": create_single_user["email"],
+        "password": create_single_user["password"],
+    }
+
+    res = client.post(url, login_cred)
+
+    access_token = res.json()["access_token"]["token"]
+
+    client.headers["Authorization"] = f"Bearer {access_token}"
+
+    yield client
