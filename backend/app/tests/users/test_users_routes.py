@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 import pytest
+from app.tests.conftest import create_single_user
 
 from app.users.schemas import UserRead
 
@@ -29,12 +30,13 @@ def test_register_user(client: TestClient) -> None:
     assert data["email"] == new_user["email"]
 
 
-def test_get_users(
-    authClient: TestClient, create_multiple_users, app: FastAPI
-) -> None:
+def test_get_users(authDataClient, create_multiple_users, app: FastAPI) -> None:
+    client: TestClient = authDataClient["client"]
+    user_data = authDataClient["user_data"]
+
     url = app.url_path_for("users:get-users")
 
-    res = authClient.get(url)
+    res = client.get(url)
 
     users: list[UserRead] = res.json()
 
@@ -42,11 +44,14 @@ def test_get_users(
     assert len(users) == 3
 
 
-def test_get_user(authClient: TestClient, app: FastAPI) -> None:
-    user_id = authClient.headers.get("user_id")
-    url = app.url_path_for("users:get-user", uuid=user_id)
+def test_get_user(authDataClient, app: FastAPI) -> None:
+    client: TestClient = authDataClient["client"]
+    user_data = authDataClient["user_data"]
 
-    authClient.headers.pop("user_id")
-    res = authClient.get(url)
+    url = app.url_path_for("users:get-user", uuid=user_data["id"])
+    res = client.get(url)
 
     assert res.status_code == 200
+    assert "id" in user_data
+    assert "first_name" in user_data
+    assert "last_name" in user_data

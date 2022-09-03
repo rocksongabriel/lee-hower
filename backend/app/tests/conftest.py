@@ -23,9 +23,7 @@ SQLALCHEMY_DATABASE_URL = (
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
-TestingSessionLocal = sessionmaker(
-    bind=engine, autoflush=False, autocommit=False
-)
+TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
 # Create and drop database tables for each test
@@ -86,7 +84,11 @@ def create_single_user(client: TestClient):
 
 
 @pytest.fixture()
-def authClient(client: TestClient, create_single_user, app: FastAPI):
+def authDataClient(client: TestClient, create_single_user, app: FastAPI):
+    """
+    Fixture to return an authentication client with Headers and a user object
+    """
+
     url = app.url_path_for("users:login-email-and-password")
     login_cred = {
         "username": create_single_user["email"],
@@ -95,9 +97,7 @@ def authClient(client: TestClient, create_single_user, app: FastAPI):
 
     res = client.post(url, login_cred)
     access_token = res.json()["access_token"]["token"]
-    client.headers["Authorization"] = f"Bearer {access_token}"
-    client.headers["user_id"] = create_single_user[
-        "id"
-    ]  # TODO: Find a nice way to do this
 
-    yield client
+    client.headers["Authorization"] = f"Bearer {access_token}"
+
+    yield {"user_data": create_single_user, "client": client}
