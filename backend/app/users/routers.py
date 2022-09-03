@@ -25,9 +25,7 @@ def user_does_not_exist_exception(uuid: UUID4):
     )
 
 
-@router.post(
-    "/register", response_model=UserRead, status_code=status.HTTP_201_CREATED
-)
+@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def register_user(data: UserRegister, db: Session = Depends(get_db)):
     """
     Api endpoint to register a user
@@ -92,7 +90,9 @@ async def update_user(
     return user
 
 
-@router.delete("/{uuid}", status_code=status.HTTP_204_NO_CONTENT, name="delete-user")
+@router.delete(
+    "/{uuid}", status_code=status.HTTP_204_NO_CONTENT, name="users:delete-user"
+)
 async def delete_user(
     uuid: UUID4,
     db: Session = Depends(get_db),
