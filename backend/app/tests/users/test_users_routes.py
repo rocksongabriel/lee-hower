@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from uuid import uuid4
+from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 import pytest
 
@@ -33,7 +34,6 @@ def test_register_user(client: TestClient) -> None:
 
 def test_get_users(authDataClient, create_multiple_users, app: FastAPI) -> None:
     client, user_data = get_client_and_user_data(authDataClient)
-
     url = app.url_path_for("users:get-users")
     res = client.get(url)
 
@@ -47,16 +47,11 @@ def test_get_users(authDataClient, create_multiple_users, app: FastAPI) -> None:
 
 
 def test_get_user(authDataClient, app: FastAPI) -> None:
-    client, user_data = get_client_and_user_data(authDataClient)
-
-    url = app.url_path_for("users:get-user", uuid=user_data["id"])
+    client, _ = get_client_and_user_data(authDataClient)
+    url = app.url_path_for("users:get-user")
     res = client.get(url)
 
-    print(user_data)
-    print("----------------------------------------------------")
-    print(res.json())
-
-    res_data = res.json()
+    res_data = res.json()[0]
 
     assert res.status_code == 200
     assert "id" in res_data
@@ -66,6 +61,28 @@ def test_get_user(authDataClient, app: FastAPI) -> None:
     assert res_data["is_active"] == True
     assert "created" in res_data
     assert "password" not in res_data
+
+
+def test_user_does_not_exist(authDataClient, app: FastAPI) -> None:
+    client, user_data = get_client_and_user_data(authDataClient)
+    random_id = uuid4()
+
+    new_user_data = {
+        "first_name": "Gabriel",
+        "last_name": "Rockson",
+        "email": user_data["email"],
+        "is_active": user_data["is_active"],
+        "created": user_data["created"],
+    }
+
+    url = app.url_path_for("users:update-user", uuid=random_id)
+
+    res = client.put(url, json=new_user_data)
+    print(res)
+    print(res.json())
+
+    assert res.status_code == 404
+    assert res.json()["detail"] == f"User with id {random_id} does not exist"
 
 
 def test_update_user(authDataClient, app: FastAPI) -> None:

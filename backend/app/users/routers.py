@@ -1,4 +1,5 @@
 from typing import List
+import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic.types import UUID4
@@ -53,7 +54,7 @@ async def get_users(
     return crud.get_all_users(db)
 
 
-@router.get("/{uuid}", response_model=UserRead, name="users:get-user")
+@router.get("/", response_model=UserRead, name="users:get-user")
 async def get_user(
     db: Session = Depends(get_db),
     current_active_user: User = Depends(get_current_active_user),
@@ -62,6 +63,7 @@ async def get_user(
     API Endpoint to get an individual user by id
     Return user info
     """
+
     return current_active_user
 
 
