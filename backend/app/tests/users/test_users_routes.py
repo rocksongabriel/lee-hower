@@ -3,7 +3,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 import pytest
 
-from app.tests.conftest import create_single_user
 from app.tests.utils import get_client_and_user_data
 from app.users.schemas import UserRead
 
@@ -17,6 +16,10 @@ def create_multiple_users(client: TestClient):
 
     client.post(url, json=user1_data)
     client.post(url, json=user2_data)
+
+
+def new_user_data():
+    return
 
 
 def test_register_user(client: TestClient) -> None:
@@ -63,28 +66,6 @@ def test_get_user(authDataClient, app: FastAPI) -> None:
     assert "password" not in res_data
 
 
-def test_user_does_not_exist(authDataClient, app: FastAPI) -> None:
-    client, user_data = get_client_and_user_data(authDataClient)
-    random_id = uuid4()
-
-    new_user_data = {
-        "first_name": "Gabriel",
-        "last_name": "Rockson",
-        "email": user_data["email"],
-        "is_active": user_data["is_active"],
-        "created": user_data["created"],
-    }
-
-    url = app.url_path_for("users:update-user", uuid=random_id)
-
-    res = client.put(url, json=new_user_data)
-    print(res)
-    print(res.json())
-
-    assert res.status_code == 404
-    assert res.json()["detail"] == f"User with id {random_id} does not exist"
-
-
 def test_update_user(authDataClient, app: FastAPI) -> None:
     client, user_data = get_client_and_user_data(authDataClient)
 
@@ -106,6 +87,48 @@ def test_update_user(authDataClient, app: FastAPI) -> None:
     assert res_data["last_name"] == new_user_data["last_name"]
 
 
+def test_user_does_not_exist__update(authDataClient, app: FastAPI) -> None:
+    client, user_data = get_client_and_user_data(authDataClient)
+    random_id = uuid4()
+
+    new_user_data = {
+        "first_name": "Gabriel",
+        "last_name": "Rockson",
+        "email": user_data["email"],
+        "is_active": user_data["is_active"],
+        "created": user_data["created"],
+    }
+
+    url = app.url_path_for("users:update-user", uuid=random_id)
+
+    res = client.put(url, json=new_user_data)
+    print(res)
+    print(res.json())
+
+    assert res.status_code == 404
+    assert res.json()["detail"] == f"User with id {random_id} does not exist"
+
+
+def test_user_not_authorized__update(
+    authDataClient, create_unauthorized_user, app: FastAPI
+) -> None:
+    client, user_data = get_client_and_user_data(authDataClient)
+
+    new_user_data = {
+        "first_name": "Gabriel",
+        "last_name": "Rockson",
+        "email": user_data["email"],
+        "is_active": user_data["is_active"],
+        "created": user_data["created"],
+    }
+
+    url = app.url_path_for("users:update-user", uuid=create_unauthorized_user["id"])
+    res = client.put(url, json=new_user_data)
+
+    assert res.status_code == 401
+    assert res.json()["detail"] == "User unauthorized to perform operation"
+
+
 def test_delete_user(authDataClient, app: FastAPI) -> None:
     client, user_data = get_client_and_user_data(authDataClient)
 
@@ -113,3 +136,26 @@ def test_delete_user(authDataClient, app: FastAPI) -> None:
     res = client.delete(url)
 
     assert res.status_code == 204
+
+
+def test_user_does_not_exist__delete(authDataClient, app: FastAPI) -> None:
+    client, _ = get_client_and_user_data(authDataClient)
+    random_id = uuid4()
+    url = app.url_path_for("users:delete-user", uuid=random_id)
+
+    res = client.delete(url)
+
+    assert res.status_code == 404
+    assert res.json()["detail"] == f"User with id {random_id} does not exist"
+
+
+def test_user_not_authorized__delete(
+    authDataClient, create_unauthorized_user, app: FastAPI
+) -> None:
+    client, _ = get_client_and_user_data(authDataClient)
+    url = app.url_path_for("users:delete-user", uuid=create_unauthorized_user["id"])
+
+    res = client.delete(url)
+
+    assert res.status_code == 401
+    assert res.json()["detail"] == "User unauthorized to perform operation"

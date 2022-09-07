@@ -69,7 +69,7 @@ def client(
 
 
 @pytest.fixture()
-def create_single_user(client: TestClient):
+def create_authorized_user(client: TestClient):
     """
     Create and return a new user object
     """
@@ -84,15 +84,27 @@ def create_single_user(client: TestClient):
 
 
 @pytest.fixture()
-def authDataClient(client: TestClient, create_single_user, app: FastAPI):
+def create_unauthorized_user(client: TestClient):
+    """
+    Create and return a new user object
+    """
+    user_data = {"email": "testuser2@gmail.com", "password": "testpass1234"}
+
+    res = client.post("/users/register", json=user_data)
+
+    return res.json()
+
+
+@pytest.fixture()
+def authDataClient(client: TestClient, create_authorized_user, app: FastAPI):
     """
     Fixture to return an authentication client with Headers and a user object
     """
 
     url = app.url_path_for("users:login-email-and-password")
     login_cred = {
-        "username": create_single_user["email"],
-        "password": create_single_user["password"],
+        "username": create_authorized_user["email"],
+        "password": create_authorized_user["password"],
     }
 
     res = client.post(url, login_cred)
@@ -100,4 +112,4 @@ def authDataClient(client: TestClient, create_single_user, app: FastAPI):
 
     client.headers["Authorization"] = f"Bearer {access_token}"
 
-    yield {"user_data": create_single_user, "client": client}
+    yield {"user_data": create_authorized_user, "client": client}

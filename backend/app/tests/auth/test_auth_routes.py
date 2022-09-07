@@ -1,15 +1,12 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-import pytest
 
 
-def test_login_user(
-    create_single_user, client: TestClient, app: FastAPI
-) -> None:
+def test_login_user(create_authorized_user, client: TestClient, app: FastAPI) -> None:
 
     login_cred = {
-        "username": create_single_user["email"],
-        "password": create_single_user["password"],
+        "username": create_authorized_user["email"],
+        "password": create_authorized_user["password"],
     }
 
     res = client.post(
